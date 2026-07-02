@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>快学 · 六阶段学习系统</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --paper: #f5f7f4;
+    --card: #ffffff;
+    --ink: #22302c;
+    --muted: #64716b;
+    --line: #dce3dd;
+    --pine: #1f6a52;
+    --pine-deep: #144638;
+    --pine-wash: #e7f0eb;
+    --amber: #b97f24;
+    --amber-wash: #f7efdf;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .serif {
+    font-family: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "SimSun", Georgia, serif;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 20px 72px; }
+
+  /* ---------- header ---------- */
+  header { margin-bottom: 28px; }
+  .kicker {
+    font-size: 12px; letter-spacing: 0.18em; color: var(--pine);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  h1 {
+    font-size: 34px; line-height: 1.25; margin: 0 0 10px;
+    font-weight: 700; text-wrap: balance;
+  }
+  .lede { color: var(--muted); max-width: 40em; margin: 0; }
+  .lede a { color: var(--pine); }
+
+  /* ---------- setup panel ---------- */
+  .setup {
+    background: var(--pine-deep); color: #eef4f0;
+    border-radius: var(--radius); padding: 20px 22px; margin: 28px 0 14px;
+  }
+  .setup-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; letter-spacing: 0.08em; color: #a8c4b7; }
+  .field input, .field select {
+    font: inherit; color: var(--ink); background: #f7faf8;
+    border: 1px solid transparent; border-radius: 6px; padding: 8px 12px;
+  }
+  .field input { width: 300px; max-width: 72vw; }
+  .field input:focus-visible, .field select:focus-visible,
+  button:focus-visible, .chip:focus-visible {
+    outline: 2px solid var(--amber); outline-offset: 2px;
+  }
+  .btn {
+    font: inherit; cursor: pointer; border: 0; border-radius: 6px;
+    padding: 9px 16px; background: var(--amber); color: #fff; font-weight: 600;
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .setup-hint { font-size: 12.5px; color: #a8c4b7; margin: 10px 0 0; }
+
+  /* ---------- saved topics ---------- */
+  .topics { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 26px; min-height: 34px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 12px; font: inherit; font-size: 13.5px; color: var(--ink);
+  }
+  .chip.active { border-color: var(--pine); background: var(--pine-wash); }
+  .chip .count { color: var(--pine); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chip .del { color: var(--muted); padding: 0 2px; }
+  .chip .del:hover { color: #a33; }
+
+  /* ---------- progress strip ---------- */
+  .progress { display: flex; gap: 5px; margin: 0 0 30px; }
+  .progress span {
+    flex: 1; height: 8px; border-radius: 4px; background: var(--line);
+    transition: background 0.25s;
+  }
+  .progress span.done { background: var(--pine); }
+
+  /* ---------- stage cards ---------- */
+  .stage {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); margin-bottom: 18px; overflow: hidden;
+  }
+  .stage-head {
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 18px 22px 0;
+  }
+  .stage-no {
+    font-size: 26px; font-weight: 700; color: var(--pine);
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .stage-title { font-size: 19px; font-weight: 700; margin: 0; }
+  .stage-en { font-size: 12.5px; color: var(--muted); letter-spacing: 0.04em; }
+  .stage-tag {
+    margin-left: auto; font-size: 11.5px; letter-spacing: 0.1em;
+    color: var(--amber); background: var(--amber-wash);
+    border-radius: 4px; padding: 2px 8px; white-space: nowrap;
+  }
+  .stage-body { padding: 8px 22px 18px; }
+  .stage-desc { color: var(--muted); margin: 6px 0 12px; max-width: 44em; }
+  details { border-top: 1px dashed var(--line); }
+  summary {
+    cursor: pointer; padding: 10px 0; color: var(--pine); font-weight: 600;
+    font-size: 13.5px; list-style: none;
+  }
+  summary::before { content: "▸ "; }
+  details[open] summary::before { content: "▾ "; }
+  pre.prompt {
+    margin: 0 0 12px; padding: 14px 16px; border-radius: 8px;
+    background: #f2f5f1; border: 1px solid var(--line);
+    white-space: pre-wrap; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, "PingFang SC", monospace;
+    font-size: 13px; line-height: 1.75; color: #333f3a;
+  }
+  pre.prompt .slot { color: var(--amber); font-weight: 700; }
+  .stage-actions { display: flex; align-items: center; gap: 14px; padding-bottom: 4px; }
+  .copy { background: var(--pine); }
+  .copy.copied { background: var(--pine-deep); }
+  .check { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; color: var(--muted); cursor: pointer; }
+  .check input { width: 16px; height: 16px; accent-color: var(--pine); cursor: pointer; }
+
+  footer {
+    margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 13px; max-width: 46em;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .progress span { transition: none; }
+  }
+  @media (max-width: 560px) {
+    h1 { font-size: 27px; }
+    .stage-head { flex-wrap: wrap; }
+    .stage-tag { margin-left: 0; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker serif">Quick Learn</div>
+    <h1 class="serif">快学 · 六阶段学习系统</h1>
+    <p class="lede">
+      真正的学习需要四样东西:一条<strong>路径</strong>、一种<strong>测试</strong>、一次<strong>压缩</strong>、一个<strong>反馈循环</strong>。
+      下面六个阶段依次对应它们——填入主题,逐个复制提示词,粘贴到任何 AI 对话里开始学。
+    </p>
+  </header>
+
+  <section class="setup" aria-label="设置学习主题">
+    <div class="setup-row">
+      <div class="field">
+        <label for="topic">我要学的主题</label>
+        <input id="topic" type="text" placeholder="例如:量子计算入门 / 西班牙语 / React" />
+      </div>
+      <div class="field">
+        <label for="level">当前水平</label>
+        <select id="level">
+          <option>完全新手</option>
+          <option>学过一点</option>
+          <option>中级</option>
+          <option>进阶</option>
+        </select>
+      </div>
+      <button class="btn" id="save">保存并追踪进度</button>
+    </div>
+    <p class="setup-hint">主题会实时填入下方所有提示词;保存后可在多个主题间切换,进度打卡存在浏览器本地。</p>
+  </section>
+
+  <div class="topics" id="topics" aria-label="已保存的主题"></div>
+  <div class="progress" id="progress" aria-label="当前主题进度"></div>
+
+  <main id="stages"></main>
+
+  <footer>
+    推荐顺序:⑤ 先选资源 → ① 看全图 → ② 定计划 → 开始学习 → ③ 每次学完做拷问测验 →
+    ④ 把学到的压缩成速查表 → ⑥ 对还觉得虚的点跑费曼循环。
+    方法来自 <a href="https://x.com/sairahul1/status/2068250224532050089">@sairahul1 的推文</a>;
+    配套的 Claude Code 技能见仓库中的 <code>/learn</code>。
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+const STAGES = [
+  {
+    no: "①", name: "学习阶梯", en: "Learning Ladder", tag: "路径 · 先看全图",
+    desc: "把主题拆成 5 个难度等级,每级有可验证的里程碑和自测题。先知道整座山长什么样,再决定从哪条路上山。",
+    prompt: `我想学习「{topic}」。我目前的水平:{level}。
+
+请把这个主题拆成 5 个清晰的难度等级,从完全新手到自信的实践者。每一级请给出:
+1. 这一级要掌握的 3–5 个核心概念或技能;
+2. 一个可验证的里程碑——做到什么就算过关(要具体,比如"能徒手写出 X",而不是"理解 X");
+3. 一个我可以用来自测的问题。
+
+最后,根据我的水平判断我现在处于第几级,下一步最该攻克的是什么。`
+  },
+  {
+    no: "②", name: "前 20 小时", en: "The First 20 Hours", tag: "路径 · 核心 20%",
+    desc: "识别出产生 80% 效果的核心 20% 内容,把最初 20 小时拆成一个个有明确产出、以动手为主的学习会话。",
+    prompt: `我想用最初 20 个小时高效入门「{topic}」,当前水平:{level}。
+
+请先明确指出:
+1. 这个主题中能产生 80% 效果的核心 20% 内容是什么;
+2. 哪些内容可以先跳过,为什么。
+
+然后把这 20 小时拆成一系列 45–90 分钟的学习会话。每个会话要有明确的目标产出,并且以动手实践/输出为主,而不是纯阅读。`
+  },
+  {
+    no: "③", name: "拷问到崩", en: "Quiz Me Until I Break", tag: "测试 · 找到真实缺口",
+    desc: "自适应测验:答对就加难,直到连错两题——那就是你的能力边界。目的不是得分,是暴露你以为会但其实不会的地方。",
+    prompt: `请就「{topic}」对我进行自适应测验。我的水平:{level}。
+
+规则:
+1. 一次只出一题,等我作答后再出下一题;
+2. 我答对就加大难度;答错时先追问我的思路,不要直接给答案;
+3. 持续升级难度,直到我连续答错 2 题为止——那就是我的能力边界;
+4. 到达边界后,诊断我的缺口属于哪一类(概念不清 / 记忆缺失 / 应用不熟),并针对性讲解;
+5. 题型混合:概念解释、常见误区陷阱、实际应用、以及"为什么不用另一种做法"。
+
+现在出第一题。`
+  },
+  {
+    no: "④", name: "单页速查表", en: "One-Page Cheat Sheet", tag: "压缩 · 快速复习",
+    desc: "把学过的内容压缩到一页:一句话定义、步骤列表、易混点对比表,薄弱点标 ⚠️ 放最显眼处。复习只看这一页。",
+    prompt: `请把「{topic}」中我已经学过的内容压缩成一页速查表:
+
+1. 核心概念用一句话定义;
+2. 关键流程用步骤列表;
+3. 容易混淆的点用对比表格;
+4. 我的薄弱点用 ⚠️ 标注,放在最显眼的位置。
+
+目标是我复习时只需要看这一页。以下是我已学的内容和薄弱点:
+[在这里粘贴你的学习记录 / 测验结果]`
+  },
+  {
+    no: "⑤", name: "噪声中的信号", en: "Signal in the Noise", tag: "资源 · 只挑 5 个",
+    desc: "开始学之前只精选 5 个资源,并说明为什么选它、排除了什么。省下的不是钱,是你最贵的注意力。",
+    prompt: `我准备开始学「{topic}」,当前水平:{level}。
+
+请为我精选恰好 5 个最值得投入的学习资源(书 / 课程 / 官方文档 / 视频 / 实战项目均可)。每个资源请说明:
+1. 它是什么;
+2. 适合我学习路径中的哪个阶段;
+3. 为什么选它而不是同类的其他资源;
+4. 大概需要投入多少时间。
+
+同时请明确告诉我:你刻意排除了哪一类资源,为什么。如果你无法确认某个资源的现状,请注明让我自行验证。`
+  },
+  {
+    no: "⑥", name: "费曼循环", en: "Feynman Loop", tag: "反馈 · 修补模糊地带",
+    desc: "对还觉得虚的点:AI 讲成 12 岁能懂的版本 → 你用自己的话讲回来 → 找出缺口只补缺的 → 循环到讲干净为止。",
+    prompt: `我们来对「{topic}」里我还觉得模糊的知识点跑费曼循环:
+
+第一步:你把它讲成 12 岁小孩能听懂的版本,多用比喻,不用术语;
+第二步:我用自己的话讲回来给你(不看资料);
+第三步:你逐句找出我解释里的缺口——说错的、含糊带过的、用术语掩盖不懂的;
+第四步:只重新讲我缺失的部分,不重复我已经讲对的;
+然后我再讲一遍,循环直到我的解释干净、准确为止。
+
+我想先从这个点开始:[写下让你觉得虚的知识点]`
+  }
+];
+
+const store = {
+  read() {
+    try { return JSON.parse(localStorage.getItem("quicklearn") || "{}"); }
+    catch { return {}; }
+  },
+  write(data) { localStorage.setItem("quicklearn", JSON.stringify(data)); }
+};
+
+const $topic = document.getElementById("topic");
+const $level = document.getElementById("level");
+const $topics = document.getElementById("topics");
+const $progress = document.getElementById("progress");
+const $stages = document.getElementById("stages");
+
+function esc(s) {
+  return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function filled(tpl) {
+  const topic = $topic.value.trim() || "(未填写主题)";
+  return tpl.replaceAll("{topic}", topic).replaceAll("{level}", $level.value);
+}
+
+function filledHtml(tpl) {
+  const topic = $topic.value.trim();
+  const t = topic ? esc(topic) : '<span class="slot">(未填写主题)</span>';
+  return esc(tpl)
+    .replaceAll("{topic}", `<span class="slot">${t}</span>`)
+    .replaceAll("{level}", `<span class="slot">${esc($level.value)}</span>`);
+}
+
+function currentTopic() {
+  const data = store.read();
+  const name = $topic.value.trim();
+  return data.topics && data.topics[name] ? { name, ...data.topics[name] } : null;
+}
+
+function renderStages() {
+  $stages.innerHTML = STAGES.map((s, i) => `
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-no serif">${s.no}</span>
+        <h2 class="stage-title serif">${s.name}</h2>
+        <span class="stage-en">${s.en}</span>
+        <span class="stage-tag">${s.tag}</span>
+      </div>
+      <div class="stage-body">
+        <p class="stage-desc">${s.desc}</p>
+        <div class="stage-actions">
+          <button class="btn copy" data-i="${i}">复制提示词</button>
+          <label class="check"><input type="checkbox" data-check="${i}" /> 这一步已完成</label>
+        </div>
+        <details>
+          <summary>查看完整提示词</summary>
+          <pre class="prompt" data-prompt="${i}"></pre>
+        </details>
+      </div>
+    </article>`).join("");
+  refreshPrompts();
+  refreshChecks();
+}
+
+function refreshPrompts() {
+  document.querySelectorAll("[data-prompt]").forEach(el => {
+    el.innerHTML = filledHtml(STAGES[+el.dataset.prompt].prompt);
+  });
+}
+
+function refreshTopics() {
+  const data = store.read();
+  const names = Object.keys(data.topics || {});
+  const cur = $topic.value.trim();
+  $topics.innerHTML = names.map(n => {
+    const t = data.topics[n];
+    const done = t.done.filter(Boolean).length;
+    return `<button class="chip ${n === cur ? "active" : ""}" data-open="${esc(n)}">
+      ${esc(n)} <span class="count">${done}/6</span><span class="del" data-del="${esc(n)}" title="删除">✕</span>
+    </button>`;
+  }).join("");
+}
+
+function refreshChecks() {
+  const t = currentTopic();
+  const done = t ? t.done : [false, false, false, false, false, false];
+  document.querySelectorAll("[data-check]").forEach(el => {
+    el.checked = !!done[+el.dataset.check];
+    el.disabled = !t;
+    el.closest(".check").title = t ? "" : "先保存主题,才能打卡";
+  });
+  $progress.innerHTML = done.map(d => `<span class="${d ? "done" : ""}"></span>`).join("");
+}
+
+function copyText(text, btn) {
+  const flash = () => {
+    btn.textContent = "已复制 ✓"; btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "复制提示词"; btn.classList.remove("copied"); }, 1600);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(flash).catch(() => fallbackCopy(text, flash));
+  } else {
+    fallbackCopy(text, flash);
+  }
+}
+
+function fallbackCopy(text, ok) {
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); ok(); } catch { alert("复制失败,请展开提示词手动复制"); }
+  ta.remove();
+}
+
+document.getElementById("save").addEventListener("click", () => {
+  const name = $topic.value.trim();
+  if (!name) { $topic.focus(); return; }
+  const data = store.read();
+  data.topics = data.topics || {};
+  data.topics[name] = data.topics[name] || { level: $level.value, done: [false, false, false, false, false, false] };
+  data.topics[name].level = $level.value;
+  store.write(data);
+  refreshTopics(); refreshChecks();
+});
+
+$topics.addEventListener("click", e => {
+  const del = e.target.closest("[data-del]");
+  if (del) {
+    e.stopPropagation();
+    const data = store.read();
+    delete data.topics[del.dataset.del];
+    store.write(data);
+    refreshTopics(); refreshChecks();
+    return;
+  }
+  const chip = e.target.closest("[data-open]");
+  if (chip) {
+    const data = store.read();
+    const t = data.topics[chip.dataset.open];
+    $topic.value = chip.dataset.open;
+    if (t.level) $level.value = t.level;
+    refreshTopics(); refreshPrompts(); refreshChecks();
+  }
+});
+
+$stages.addEventListener("click", e => {
+  const btn = e.target.closest(".copy");
+  if (btn) copyText(filled(STAGES[+btn.dataset.i].prompt), btn);
+});
+
+$stages.addEventListener("change", e => {
+  const box = e.target.closest("[data-check]");
+  if (!box) return;
+  const name = $topic.value.trim();
+  const data = store.read();
+  if (!data.topics || !data.topics[name]) { box.checked = false; return; }
+  data.topics[name].done[+box.dataset.check] = box.checked;
+  store.write(data);
+  refreshTopics(); refreshChecks();
+});
+
+[$topic, $level].forEach(el => el.addEventListener("input", () => {
+  refreshPrompts(); refreshTopics(); refreshChecks();
+}));
+
+renderStages();
+refreshTopics();
+</script>
+
+</html>
